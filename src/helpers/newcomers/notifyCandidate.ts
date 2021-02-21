@@ -1,45 +1,42 @@
-import { ExtraReplyMessage } from 'telegraf/typings/telegram-types'
-import { cloneDeep } from 'lodash'
-import { Equation, CaptchaType } from '@models/Chat'
-import { User } from 'telegram-typings'
-import { Context, Extra, Markup } from 'telegraf'
-import { strings } from '@helpers/strings'
-import { constructMessageWithEntities } from '@helpers/newcomers/constructMessageWithEntities'
-import { getLink, getName, getUsername } from '@helpers/getUsername'
-import { isRuChat } from '@helpers/isRuChat'
-import { isOver10000 } from '@helpers/goldenBorodutchSubCount'
+import { ExtraReplyMessage } from "telegraf/typings/telegram-types";
+import { cloneDeep } from "lodash";
+import { Equation, CaptchaType } from "@models/Chat";
+import { User } from "telegram-typings";
+import { Context, Extra, Markup } from "telegraf";
+import { strings } from "@helpers/strings";
+import { constructMessageWithEntities } from "@helpers/newcomers/constructMessageWithEntities";
+import { getLink, getName, getUsername } from "@helpers/getUsername";
+import { isRuChat } from "@helpers/isRuChat";
+// import { isOver10000 } from "@helpers/goldenBorodutchSubCount";
 
 const promoAdditions = {
-  ru: () =>
-    isOver10000()
-      ? 'При поддержке <a href="https://todorant.com/?utm_source=shieldy">Тудуранта</a>'
-      : 'При поддержке <a href="https://t.me/golden_borodutch">Золота Бородача</a>',
-  en: () =>
-    'Powered by <a href="https://todorant.com/?utm_source=shieldy">Todorant</a>',
-}
+  ru: () => '',
+  en: () => '',
+
+};
 const promoExceptions = [
-  -1001007166727,
+  // -1001007166727,
 
-  -1001295782139,
-  -1001233073874,
-  -1001060565714,
-  -1001070350591,
-  -1001098630768,
-  -1001145658234,
-  -1001271442507,
-  -1001286547060,
-  -1001093535082,
+  // -1001295782139,
+  // -1001233073874,
+  // -1001060565714,
+  // -1001070350591,
+  // -1001098630768,
+  // -1001145658234,
+  // -1001271442507,
+  // -1001286547060,
+  // -1001093535082,
 
-  -1001214141592,
+  // -1001214141592,
 
-  -1001372515447,
+  // -1001372515447,
 
-  -1001078017687,
-  -1001224633906,
-  -1001267580592,
+  // -1001078017687,
+  // -1001224633906,
+  // -1001267580592,
 
-  -1001217329168,
-]
+  // -1001217329168,
+];
 
 export async function notifyCandidate(
   ctx: Context,
@@ -47,11 +44,11 @@ export async function notifyCandidate(
   equation?: Equation,
   image?: { png: Buffer; text: string }
 ) {
-  const chat = ctx.dbchat
+  const chat = ctx.dbchat;
   const captchaMessage = ctx.dbchat.captchaMessage
     ? cloneDeep(ctx.dbchat.captchaMessage)
-    : undefined
-  const warningMessage = strings(chat, `${chat.captchaType}_warning`)
+    : undefined;
+  const warningMessage = strings(chat, `${chat.captchaType}_warning`);
   const extra =
     chat.captchaType !== CaptchaType.BUTTON
       ? Extra.HTML(true).webPreview(false)
@@ -60,24 +57,24 @@ export async function notifyCandidate(
           .markup((m) =>
             m.inlineKeyboard([
               m.callbackButton(
-                chat.buttonText || strings(chat, 'captcha_button'),
+                chat.buttonText || strings(chat, "captcha_button"),
                 `${chat.id}~${candidate.id}`
               ),
             ])
-          )
+          );
   if (
     chat.customCaptchaMessage &&
     captchaMessage &&
     (chat.captchaType !== CaptchaType.DIGITS ||
-      captchaMessage.message.text.includes('$equation'))
+      captchaMessage.message.text.includes("$equation"))
   ) {
-    const text = captchaMessage.message.text
+    const text = captchaMessage.message.text;
     if (
-      text.includes('$username') ||
-      text.includes('$title') ||
-      text.includes('$equation') ||
-      text.includes('$seconds') ||
-      text.includes('$fullname')
+      text.includes("$username") ||
+      text.includes("$title") ||
+      text.includes("$equation") ||
+      text.includes("$seconds") ||
+      text.includes("$fullname")
     ) {
       const messageToSend = constructMessageWithEntities(
         captchaMessage.message,
@@ -85,103 +82,103 @@ export async function notifyCandidate(
           $username: getUsername(candidate),
           $fullname: getName(candidate),
           $title: (await ctx.getChat()).title,
-          $equation: equation ? (equation.question as string) : '',
+          $equation: equation ? (equation.question as string) : "",
           $seconds: `${chat.timeGiven}`,
         },
         getLink(candidate)
-      )
+      );
       let formattedText = (Markup as any).formatHTML(
         messageToSend.text,
         messageToSend.entities
-      )
+      );
       if (!promoExceptions.includes(ctx.chat.id)) {
-        const promoAddition = promoAdditions[isRuChat(chat) ? 'ru' : 'en']()
-        formattedText = `${formattedText}\n${promoAddition}`
+        const promoAddition = promoAdditions[isRuChat(chat) ? "ru" : "en"]();
+        formattedText = `${formattedText}\n${promoAddition}`;
       }
       if (image) {
         return ctx.replyWithPhoto({ source: image.png } as any, {
           caption: formattedText,
-          parse_mode: 'HTML',
-        })
+          parse_mode: "HTML",
+        });
       } else {
         return ctx.telegram.sendMessage(
           chat.id,
           formattedText,
           extra as ExtraReplyMessage
-        )
+        );
       }
     } else {
-      const message = cloneDeep(captchaMessage.message)
+      const message = cloneDeep(captchaMessage.message);
       const formattedText = (Markup as any).formatHTML(
         message.text,
         message.entities
-      )
-      const promoAddition = promoAdditions[isRuChat(chat) ? 'ru' : 'en']()
+      );
+      const promoAddition = promoAdditions[isRuChat(chat) ? "ru" : "en"]();
       message.text = promoExceptions.includes(ctx.chat.id)
         ? `${getUsername(candidate)}\n\n${formattedText}`
-        : `${getUsername(candidate)}\n\n${formattedText}\n${promoAddition}`
+        : `${getUsername(candidate)}\n\n${formattedText}\n${promoAddition}`;
       try {
         const sentMessage = await ctx.telegram.sendCopy(
           chat.id,
           message,
           extra as ExtraReplyMessage
-        )
-        return sentMessage
+        );
+        return sentMessage;
       } catch (err) {
-        message.entities = []
+        message.entities = [];
         const sentMessage = await ctx.telegram.sendCopy(
           chat.id,
           message,
           extra as ExtraReplyMessage
-        )
-        return sentMessage
+        );
+        return sentMessage;
       }
     }
   } else {
     if (image) {
-      const promoAddition = promoAdditions[isRuChat(chat) ? 'ru' : 'en']()
+      const promoAddition = promoAdditions[isRuChat(chat) ? "ru" : "en"]();
       return ctx.replyWithPhoto({ source: image.png } as any, {
         caption: promoExceptions.includes(ctx.chat.id)
           ? `<a href="tg://user?id=${candidate.id}">${getUsername(
               candidate
             )}</a>${warningMessage} (${chat.timeGiven} ${strings(
               chat,
-              'seconds'
+              "seconds"
             )})`
           : `<a href="tg://user?id=${candidate.id}">${getUsername(
               candidate
             )}</a>${warningMessage} (${chat.timeGiven} ${strings(
               chat,
-              'seconds'
+              "seconds"
             )})\n${promoAddition}`,
-        parse_mode: 'HTML',
-      })
+        parse_mode: "HTML",
+      });
     } else {
-      const promoAddition = promoAdditions[isRuChat(chat) ? 'ru' : 'en']()
+      const promoAddition = promoAdditions[isRuChat(chat) ? "ru" : "en"]();
       return ctx.replyWithMarkdown(
         promoExceptions.includes(ctx.chat.id)
           ? `${
               chat.captchaType === CaptchaType.DIGITS
                 ? `(${equation.question}) `
-                : ''
+                : ""
             }<a href="tg://user?id=${candidate.id}">${getUsername(
               candidate
             )}</a>${warningMessage} (${chat.timeGiven} ${strings(
               chat,
-              'seconds'
+              "seconds"
             )})`
           : `${
               chat.captchaType === CaptchaType.DIGITS
                 ? `(${equation.question}) `
-                : ''
+                : ""
             }<a href="tg://user?id=${candidate.id}">${getUsername(
               candidate
             )}</a>${warningMessage} (${chat.timeGiven} ${strings(
               chat,
-              'seconds'
+              "seconds"
             )})\n${promoAddition}`,
         extra
-      )
+      );
     }
   }
 }

@@ -45,7 +45,9 @@ export async function checkRestrict(ctx: Context, next: () => any) {
       message.photo ||
       message.video_note ||
       message.video ||
-      message.game)
+      message.game
+      // temp: when restricted user tries to send text message, just delete it
+      message.text)
   ) {
     deleteMessageSafe(ctx)
     return

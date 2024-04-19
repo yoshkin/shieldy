@@ -58,6 +58,7 @@ buttonText: <code>${chat.buttonText || 'Not set'}</code>
 allowInvitingBots: <code>${chat.allowInvitingBots}</code>
 skipOldUsers: <code>${chat.skipOldUsers}</code>
 skipVerifiedUsers: <code>${chat.skipVerifiedUsers}</code>
+filters: <code>${chat.filters.toString() || 'Not set'}</code>
 greetingButtons:
 <code>${chat.greetingButtons || 'Not set'}</code>`,
     Extra.inReplyTo(ctx.message.message_id).HTML(true)

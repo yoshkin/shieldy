@@ -15,6 +15,8 @@ import { setupRestrict } from '@commands/restrict'
 import { checkRestrict } from '@middlewares/checkRestrict'
 import { setupNoChannelLinks } from '@commands/noChannelLinks'
 import { checkNoChannelLinks } from '@middlewares/checkNoChannelLinks'
+import { setupFilters } from '@commands/filters'
+import { checkFilters } from '@middlewares/checkFilters'
 import { setupDeleteEntryMessages } from '@commands/deleteEntryMessages'
 import { setupGreeting } from '@commands/greeting'
 import { setupTrust } from '@commands/trust'
@@ -56,6 +58,8 @@ bot.use(attachChatMember)
 bot.use(checkRestrict)
 // Check if channel links are present
 bot.use(checkNoChannelLinks)
+// check filters
+bot.use(checkFilters)
 // Commands
 setupHelp(bot)
 setupLanguage(bot)
@@ -64,6 +68,7 @@ setupTimeLimit(bot)
 setupLock(bot)
 setupRestrict(bot)
 setupNoChannelLinks(bot)
+setupFilters(bot)
 setupDeleteEntryMessages(bot)
 setupGreeting(bot)
 setupTrust(bot)

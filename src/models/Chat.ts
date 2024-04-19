@@ -129,6 +129,8 @@ export class Chat {
   allowInvitingBots: boolean
   @prop()
   greetingButtons?: string
+  @prop()
+  filters?: Array<string>
   @prop({ required: true, default: false })
   skipOldUsers: boolean
   @prop({ required: true, default: false })

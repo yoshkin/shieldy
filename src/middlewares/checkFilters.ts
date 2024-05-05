@@ -4,7 +4,6 @@ import { Context } from "telegraf";
 import { modifyRestrictedUsers } from "@helpers/restrictedUsers";
 import { Candidate } from "@models/Chat";
 
-
 export async function checkFilters(ctx: Context, next: Function) {
   if (ctx.update.message?.date && ctx.update.message?.text === "/help") {
     console.log(
@@ -42,7 +41,7 @@ export async function checkFilters(ctx: Context, next: Function) {
 
   // If the link is a telegram link, mark the message for deletion
   for (const string of disallowedStings) {
-    if (message.text.includes(string)) {
+    if (message.text.toLowerCase().includes(string.toLowerCase())) {
       needsToBeDeleted = true;
       break;
     }
@@ -52,9 +51,11 @@ export async function checkFilters(ctx: Context, next: Function) {
   if (needsToBeDeleted) {
     deleteMessageSafe(ctx);
     // Ban in Telegram
-    await ctx.telegram.kickChatMember(ctx.dbchat.id, ctx.from.id)
+    await ctx.telegram.kickChatMember(ctx.dbchat.id, ctx.from.id);
     // Unrestrict in shieldy
-    modifyRestrictedUsers(ctx.dbchat, false, [{ id: ctx.from.id } as Candidate])
+    modifyRestrictedUsers(ctx.dbchat, false, [
+      { id: ctx.from.id } as Candidate,
+    ]);
     return;
   }
   // Or just continue

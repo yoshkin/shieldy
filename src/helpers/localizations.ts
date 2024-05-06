@@ -1561,6 +1561,10 @@ export const localizations = {
     en: "No filters",
     ru: "Нет фильтров",
   },
+  addFilterError: {
+    en: "Filter can`t be empty!",
+    ru: "Вы не указали текст для фильтрации!",
+  },
   greetingButtonsEmpty: {
     en: "No buttons",
     ru: "Нет кнопок",

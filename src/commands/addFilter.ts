@@ -10,7 +10,7 @@ import { ExtraReplyMessage } from "telegraf/typings/telegram-types";
 export function setupAddFilter(bot: Telegraf<Context>) {
   // Setup command
   bot.command("addFilter", checkLock, clarifyIfPrivateMessages, async (ctx) => {
-    const text = ctx.message.text;
+    const text = ctx.message.text.substr(11);
     if (!text) {
       ctx.reply(
         strings(ctx.dbchat, "addFilterError"),
